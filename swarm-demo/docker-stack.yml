@@ -12,13 +12,12 @@ services:
       NODE_ID: "{{.Node.ID}}"
     deploy:
       replicas: 4
-      placement:
-        max_replicas_per_node: 2
+      restart_policy:
+        condition: on-failure
     ports:
       - target: 80
         published: 80
         protocol: tcp
-        mode: host
 
 networks:
   prod_net:
