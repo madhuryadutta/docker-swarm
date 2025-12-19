@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  app:
+    image: swarm-demo:latest
+    networks:
+      - prod_net
+    environment:
+      SERVICE_NAME: "{{.Service.Name}}"
+      TASK_NAME: "{{.Task.Name}}"
+      TASK_ID: "{{.Task.ID}}"
+      NODE_ID: "{{.Node.ID}}"
+    deploy:
+      replicas: 4
+      placement:
+        max_replicas_per_node: 2
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+
+networks:
+  prod_net:
+    external: true
