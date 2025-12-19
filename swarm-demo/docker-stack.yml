@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   app:
-    image: swarm-demo:latest
+    image: ghcr.io/madhuryadutta/docker-swarm:latest
     networks:
       - prod_net
     environment:

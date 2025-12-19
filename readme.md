@@ -283,24 +283,310 @@ tar czvf swarm-backup.tar.gz /var/lib/docker/swarm
 
 ---
 
-## 🧠 Recommendation (based on your SaaS style questions)
+**production-ready cheat sheet** of **ALL commands related to logs, containers, tasks, services, and stacks in Docker Swarm**.
 
-For **MVP / early SaaS**:
-✔ Docker Swarm + ALB
-✔ Cheapest
-✔ Simple
-✔ Stable
-
-For **enterprise scale later**:
-➡️ Migrate to EKS
 
 ---
 
-If you want, next I can:
+# 🧱 STACK (Project-level)
 
-* Add **Laravel + Swarm** real example
-* Add **Caddy / Nginx inside Swarm**
-* Compare **ALB vs NLB**
-* Give **cost estimate (₹ / month)**
+### List stacks
 
-Just tell me 👍
+```bash
+docker stack ls
+```
+
+### Deploy stack
+
+```bash
+docker stack deploy -c docker-stack.yml prod
+```
+
+### Remove stack
+
+```bash
+docker stack rm prod
+```
+
+### See services in stack
+
+```bash
+docker stack services prod
+```
+
+### See tasks in stack
+
+```bash
+docker stack ps prod
+```
+
+---
+
+# ⚙️ SERVICE (Swarm service level)
+
+### List all services
+
+```bash
+docker service ls
+```
+
+### Inspect service (important)
+
+```bash
+docker service inspect prod_app --pretty
+```
+
+### See which node runs which task
+
+```bash
+docker service ps prod_app
+```
+
+### Scale service
+
+```bash
+docker service scale prod_app=4
+```
+
+### Force restart all tasks
+
+```bash
+docker service update --force prod_app
+```
+
+### Rollback service
+
+```bash
+docker service rollback prod_app
+```
+
+---
+
+# 📜 LOGS (MOST IMPORTANT)
+
+## 🔹 Service logs (recommended)
+
+### View logs
+
+```bash
+docker service logs prod_app
+```
+
+### Follow logs
+
+```bash
+docker service logs -f prod_app
+```
+
+### Last 100 lines
+
+```bash
+docker service logs --tail 100 prod_app
+```
+
+### With timestamps
+
+```bash
+docker service logs -f --timestamps prod_app
+```
+
+### Since / until time
+
+```bash
+docker service logs \
+  --since "2025-12-18T10:00:00" \
+  --until "2025-12-18T10:30:00" \
+  prod_app
+```
+
+---
+
+## 🔹 Task-specific logs
+
+### Get task list
+
+```bash
+docker service ps prod_app
+```
+
+### Find container ID from task
+
+```bash
+docker ps
+```
+
+### View logs of one container
+
+```bash
+docker logs <container_id>
+```
+
+### Follow container logs
+
+```bash
+docker logs -f <container_id>
+```
+
+---
+
+# 🧩 CONTAINER (Node-level)
+
+### List running containers
+
+```bash
+docker ps
+```
+
+### List all containers
+
+```bash
+docker ps -a
+```
+
+### Inspect container
+
+```bash
+docker inspect <container_id>
+```
+
+### Exec into container
+
+```bash
+docker exec -it <container_id> sh
+```
+
+### Restart container (NOT recommended in Swarm)
+
+```bash
+docker restart <container_id>
+```
+
+---
+
+# 🔍 TASK (Swarm internal)
+
+### Inspect task
+
+```bash
+docker inspect <task_id>
+```
+
+### See task failure reason
+
+```bash
+docker service ps prod_app --no-trunc
+```
+
+---
+
+# 🌐 NETWORK (Container networking)
+
+### List networks
+
+```bash
+docker network ls
+```
+
+### Inspect overlay network
+
+```bash
+docker network inspect prod_net
+```
+
+---
+
+# 💾 VOLUMES
+
+### List volumes
+
+```bash
+docker volume ls
+```
+
+### Inspect volume
+
+```bash
+docker volume inspect volume_name
+```
+
+---
+
+# 🧹 CLEANUP (Use carefully)
+
+### Remove stopped containers
+
+```bash
+docker container prune
+```
+
+### Remove unused images
+
+```bash
+docker image prune -a
+```
+
+### Remove unused networks
+
+```bash
+docker network prune
+```
+
+### Remove unused volumes
+
+```bash
+docker volume prune
+```
+
+---
+
+# 🚨 EMERGENCY / DEBUG
+
+### Force redeploy service
+
+```bash
+docker service update --force prod_app
+```
+
+### Check daemon logs
+
+```bash
+journalctl -u docker
+```
+
+### See resource usage
+
+```bash
+docker stats
+```
+
+---
+
+# 📌 MOST-USED (MEMORIZE THESE)
+
+```bash
+docker stack ps prod
+docker service ps prod_app
+docker service logs -f prod_app
+docker ps
+docker logs <container_id>
+```
+
+---
+
+# 🧠 PRODUCTION RULES (IMPORTANT)
+
+✔ Use **service logs**, not container logs
+✔ Containers are **ephemeral**
+✔ Never restart containers manually in Swarm
+✔ Use `docker service update` for redeploy
+
+---
+
+## ✅ Typical Debug Flow (Real World)
+
+```bash
+docker stack ps prod
+docker service ps prod_app
+docker service logs -f prod_app
+```
+
